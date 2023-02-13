@@ -9,18 +9,39 @@
 void l1_normalize(image im)
 {
     // TODO
+    float sum=0;
+    for(int i=0;i<im.w*im.h*im.c;i++){
+        sum+=im.data[i];
+    }
+    for(int i=0;i<im.w*im.h*im.c;i++){
+        im.data[i]=im.data[i]/sum;
+    }
+
 }
 
 image make_box_filter(int w)
 {
     // TODO
-    return make_image(1,1,1);
-}
+    image box=make_image(w,w,1);
+    for(int i=0;i<w*w;i++){
+        box.data[i]=1;
+    }
+    l1_normalize(box);
+    return box;
+   
 
 image convolve_image(image im, image filter, int preserve)
 {
     // TODO
-    return make_image(1,1,1);
+    assert(filter.c==im.c || filter.c==1);
+
+    image conv=make_image(im.w,im.h,im.c);
+
+    int pad=filter.w/2;
+
+    image image_padded=make_image(im.w+2*pad,im.h+2*pad,im.c);
+    
+    
 }
 
 image make_highpass_filter()
