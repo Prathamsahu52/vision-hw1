@@ -10,8 +10,6 @@ float nn_interpolate(image im, float x, float y, int c)
     
 }
 
-
-
 image nn_resize(image im, int w, int h)
 {
     // TODO Fill in (also fix that first line)

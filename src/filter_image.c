@@ -13,6 +13,7 @@ void l1_normalize(image im)
     for(int i=0;i<im.w*im.h*im.c;i++){
         sum+=im.data[i];
     }
+
     for(int i=0;i<im.w*im.h*im.c;i++){
         im.data[i]=im.data[i]/sum;
     }
@@ -28,6 +29,7 @@ image make_box_filter(int w)
     }
     l1_normalize(box);
     return box;
+}
    
 
 image convolve_image(image im, image filter, int preserve)
@@ -37,29 +39,98 @@ image convolve_image(image im, image filter, int preserve)
 
     image conv=make_image(im.w,im.h,im.c);
 
-    int pad=filter.w/2;
+    image conv_npres=make_image(im.w,im.h,1);
 
-    image image_padded=make_image(im.w+2*pad,im.h+2*pad,im.c);
+    for(int i=0;i<im.w;i++){
+        for(int j=0;j<im.h;j++ ){
+            for(int k=0;k<im.c;k++){
+
+                float sum=0;
+                for(int l=0;l<filter.w;l++){
+                    for(int m=0;m<filter.h;m++){
+                        int x=i+l-filter.w/2;
+                        int y=j+m-filter.h/2;
+                        if(x>=0 && x<im.w && y>=0 && y<im.h){
+                            if(filter.c==1){
+                                sum+=get_pixel(im,x,y,k)*get_pixel(filter,l,m,0);
+                            }
+                            else{
+                                sum+=get_pixel(im,x,y,k)*get_pixel(filter,l,m,k);
+                            }
+                        }
+                    }
+                }
+                if(preserve==1){
+                    set_pixel(conv,i,j,k,sum);
+                }
+                else{
+                    set_pixel(conv_npres,i,j,0,sum);
+                }
+
+            }
+        }
+    }
+
+    if(preserve==1){
+        return conv;
+    }
+    else{
+        return conv_npres;
+    }
     
+
     
 }
 
 image make_highpass_filter()
 {
     // TODO
-    return make_image(1,1,1);
+    image high=make_image(3,3,1);
+    high.data[0]=0;
+    high.data[1]=-1;
+    high.data[2]=0;
+    high.data[3]=-1;
+    high.data[4]=4;
+    high.data[5]=-1;
+    high.data[6]=0;
+    high.data[7]=-1;
+    high.data[8]=0;
+    return high;
 }
 
 image make_sharpen_filter()
 {
     // TODO
-    return make_image(1,1,1);
+    image sharp=make_image(3,3,1);
+    sharp.data[0]=0;
+    sharp.data[1]=-1;
+    sharp.data[2]=0;
+    sharp.data[3]=-1;
+    sharp.data[4]=5;
+    sharp.data[5]=-1;
+    sharp.data[6]=0;
+    sharp.data[7]=-1;
+    sharp.data[8]=0;
+    return sharp;
+    
 }
 
 image make_emboss_filter()
 {
     // TODO
-    return make_image(1,1,1);
+    image emboss=make_image(3,3,1);
+    emboss.data[0]=-2;
+    emboss.data[1]=-1;
+    emboss.data[2]=0;
+    emboss.data[3]=-1;
+    emboss.data[4]=1;
+    emboss.data[5]=1;
+    emboss.data[6]=0;
+    emboss.data[7]=1;
+    emboss.data[8]=2;
+    return emboss;
+
+    
 }
 
 // Question 2.2.1: Which of these filters should we use preserve when we run our convolution and which ones should we not? Why?
